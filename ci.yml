@@ -1,0 +1,39 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-and-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest
+
+  sample-db:
+    runs-on: ubuntu-latest
+    # Only meaningful once the sample seed is committed
+    if: hashFiles('docker/mariadb/init/03_raw_seed.sql.gz') != ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: cp .env.example .env
+      - run: docker compose up -d --wait db
+      - name: Show what the init scripts loaded
+        run: |
+          docker compose exec -T db sh -c 'mariadb -uroot -p"$MARIADB_ROOT_PASSWORD" -e "
+            SELECT table_schema, table_name, table_rows FROM information_schema.tables
+            WHERE table_schema NOT IN (\"mysql\",\"sys\",\"information_schema\",\"performance_schema\")
+            ORDER BY 1, 2"'
+      - run: uv sync
+      - name: Migrate analysis DB
+        run: uv run alembic upgrade head
+      - name: Ingest raw portals into unified_postings
+        run: uv run python -m jobpipe.ingest
+      - run: uv run pytest -m db
