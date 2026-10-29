@@ -27,12 +27,12 @@ unified_postings = Table(
     Column("title", String(256), nullable=False),
     Column("url", String(512), nullable=False),
     Column("location", String(256)),
-    Column("posted", DateTime),
-    Column("scraped", DateTime),
+    Column("posted", String(128)),  # as published; free text on some portals ("Πριν 3 ώρες")
+    Column("scraped", DateTime),  # collection time: the date used for filtering and windows
     Column("company", String(256)),
     Column("description", Text),
     Column("job_type", String(64)),
     Column("ingested_at", DateTime, nullable=False, server_default=func.now()),
     UniqueConstraint("portal", "source_id", name="uq_portal_source"),
-    Index("ix_unified_posted", "posted"),
+    Index("ix_unified_scraped", "scraped"),
 )

@@ -7,7 +7,8 @@ from sqlalchemy import Connection, inspect
 log = logging.getLogger(__name__)
 
 KEY_COLUMN = "id"
-DATE_COLUMN = "posted"
+# `posted` is free text on some portals ("Πριν 3 ώρες"), so `scraped` is the date we use
+DATE_COLUMN = "scraped"
 TEXT_COLUMNS = ["title", "description", "company"]
 COLUMNS = ["id", "title", "url", "location", "posted", "scraped", "company", "description", "type"]
 

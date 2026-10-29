@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Source | 6 Greek job portals (public listings) |
-| Period | see `posted_from` / `posted_to` in `sample_manifest.json` (10 days) |
+| Period | see `scraped_from` / `scraped_to` in `sample_manifest.json` (10 days) |
 | Tables | `raw_portals.*`, one per portal, identical structure |
 | Rows | see `sample_manifest.json` |
 | Language | Greek (some English) |
@@ -16,8 +16,8 @@
 | `title` | varchar(256) | As published |
 | `url` | varchar(512) | Public posting URL, kept as is |
 | `location` | varchar(256) | As published |
-| `posted` | datetime | Publication date on the portal |
-| `scraped` | timestamp | Collection time |
+| `posted` | varchar | As shown on the portal; free text on some portals (e.g. `Πριν 3 ώρες`), so not used as a date |
+| `scraped` | timestamp | Collection time. **The date used** for the sample window and all filtering |
 | `company` | varchar(256) | As published |
 | `description` | text | As published |
 | `type` | varchar(64) | Contract / employment type as published |

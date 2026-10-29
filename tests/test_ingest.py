@@ -18,7 +18,7 @@ from jobpipe.ingest import ingest, make_uid
 RAW_SCHEMA = """
 CREATE TABLE raw_portals.`{t}` (
   `id` INTEGER NOT NULL, `title` TEXT NOT NULL, `url` TEXT NOT NULL, `location` TEXT,
-  `posted` DATETIME, `scraped` TIMESTAMP, `company` TEXT, `description` TEXT, `type` TEXT
+  `posted` TEXT, `scraped` TIMESTAMP, `company` TEXT, `description` TEXT, `type` TEXT
 )"""
 
 
@@ -45,8 +45,9 @@ def engine(tmp_path):
         # Same source id 1 in two portals: must become two distinct postings
         c.execute(
             text(
-                "INSERT INTO raw_portals.jobseeker (id,title,url,posted,type) VALUES "
-                "(1,'Λογιστής','u1','2025-11-01','Πλήρης'),(2,'Πωλητής','u2','2025-11-02',NULL)"
+                "INSERT INTO raw_portals.jobseeker (id,title,url,posted,scraped,type) VALUES "
+                "(1,'Λογιστής','u1','Πριν 3 ώρες','2025-11-01 10:00','Πλήρης'),"
+                "(2,'Πωλητής','u2','2025-11-02','2025-11-02 08:00',NULL)"
             )
         )
         c.execute(
@@ -69,7 +70,8 @@ def test_ingest_unifies_with_portal_and_uid(engine):
         assert ingest(c, "raw_portals") == {"jobseeker": 2, "kariera": 1, "xe": 0}
         rows = c.execute(
             text(
-                "SELECT uid, portal, source_id, title, job_type FROM unified_postings ORDER BY uid"
+                "SELECT uid, portal, source_id, title, job_type, posted "
+                "FROM unified_postings ORDER BY uid"
             )
         ).all()
 
@@ -81,6 +83,7 @@ def test_ingest_unifies_with_portal_and_uid(engine):
     assert len({r.uid for r in rows}) == 3
     by_key = {(r.portal, r.source_id): r for r in rows}
     assert by_key[("jobseeker", 1)].job_type == "Πλήρης"
+    assert by_key[("jobseeker", 1)].posted == "Πριν 3 ώρες"  # free text kept as published
     assert by_key[("kariera", 1)].title == "Οδηγός"
 
 

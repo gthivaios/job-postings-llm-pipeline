@@ -8,7 +8,7 @@ from jobpipe.sample import prepare
 SCHEMA = """
 CREATE TABLE `{t}` (
   `id` INTEGER NOT NULL, `title` TEXT NOT NULL, `url` TEXT NOT NULL, `location` TEXT,
-  `posted` DATETIME, `scraped` TIMESTAMP, `company` TEXT, `description` TEXT, `type` TEXT
+  `posted` TEXT, `scraped` TIMESTAMP, `company` TEXT, `description` TEXT, `type` TEXT
 )"""
 
 
@@ -35,15 +35,15 @@ def conn():
         ]
         c.execute(
             text(
-                "INSERT INTO jobseeker (id,title,url,location,posted,company,description) "
+                "INSERT INTO jobseeker (id,title,url,location,scraped,company,description) "
                 "VALUES (:0,:1,:2,:3,:4,:5,:6)"
             ),
             [dict(zip(map(str, range(7)), r, strict=True)) for r in rows],
         )
         c.execute(
             text(
-                "INSERT INTO portal_b (id,title,url,posted,description) VALUES "
-                "(1,'Πωλητής 6941234567','u','2025-11-03',NULL)"
+                "INSERT INTO portal_b (id,title,url,posted,scraped,description) VALUES "
+                "(1,'Πωλητής','u','Πριν 3 ώρες','2025-11-03 09:00',NULL)"
             )
         )
         yield c
@@ -54,7 +54,7 @@ def test_manifest_counts_and_dates(conn):
 
     assert manifest["tables"] == {"jobseeker": 2500, "portal_b": 1}
     assert manifest["total_rows"] == 2501
-    assert (manifest["posted_from"], manifest["posted_to"]) == ("2025-11-01", "2025-11-10")
+    assert (manifest["scraped_from"], manifest["scraped_to"]) == ("2025-11-01", "2025-11-10")
 
 
 def test_data_left_unchanged(conn):

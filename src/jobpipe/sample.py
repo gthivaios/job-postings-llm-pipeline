@@ -42,8 +42,8 @@ def build_manifest(conn: Connection, tables: list[str]) -> dict:
     return {
         "tables": counts,
         "total_rows": sum(counts.values()),
-        "posted_from": lo,
-        "posted_to": hi,
+        "scraped_from": lo,
+        "scraped_to": hi,
     }
 
 
@@ -65,11 +65,11 @@ def main() -> None:
     for table, n in manifest["tables"].items():
         log.info("%-20s %6d rows", table, n)
     log.info(
-        "wrote %s: %d rows, posted %s to %s",
+        "wrote %s: %d rows, scraped %s to %s",
         MANIFEST_PATH,
         manifest["total_rows"],
-        manifest["posted_from"],
-        manifest["posted_to"],
+        manifest["scraped_from"],
+        manifest["scraped_to"],
     )
 
 

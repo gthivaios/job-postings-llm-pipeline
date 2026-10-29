@@ -1,0 +1,13 @@
+{
+  "tables": {
+    "careerjet": 294,
+    "careernet": 1187,
+    "jobfind": 11147,
+    "jobseeker": 180,
+    "kariera": 6626,
+    "skywalker": 4648
+  },
+  "total_rows": 24082,
+  "scraped_from": "2026-03-26",
+  "scraped_to": "2026-05-10"
+}
