@@ -8,6 +8,9 @@ license = { text = "MIT" }
 authors = [{ name = "Giannis Thivaios" }]
 dependencies = [
     "alembic>=1.20.1",
+    "emoji>=2.16.0",
+    "openai>=3.41.0",
+    "opik>=2.2.133",
     "pydantic-settings>=2.4",
     "pymysql>=1.1",
     "sqlalchemy>=2.0",
